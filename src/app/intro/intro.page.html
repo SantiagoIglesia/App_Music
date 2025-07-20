@@ -1,0 +1,13 @@
+<ion-content *ngIf="datos_cargados" [style.--background]="tema_actual" [style.--color]="letra_tema_actual">
+  <div>
+    <swiper-container pagination="true" loop="true" slides-per-view="1" navigation="true">
+      <swiper-slide *ngFor="let intro of intros" class="swiper-content"><img [src]="intro.image"></swiper-slide>
+    </swiper-container>
+  </div>
+  <div class="ion-text-center ion-margin-top">
+    <ion-button (click)="verHome()">Ir al Home</ion-button>
+  </div>
+</ion-content>
+<ion-content *ngIf="!datos_cargados">
+  <ion-spinner name="crescent"></ion-spinner>
+</ion-content>

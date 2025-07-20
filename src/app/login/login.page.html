@@ -1,0 +1,37 @@
+<ion-content style="--background: url('/assets/images/background-login.jpg') no-repeat center center / cover;" [style.--color]="letra">
+  <figure class="profile-default ion-text-center ion-margin-bottom">
+    <p>Ingresa tus datos</p>
+    <img [src]="avatar" alt="avatar">
+  </figure>
+  <form [formGroup]="loginForm" (ngSubmit)="loginUser(loginForm.value)">
+    <ion-grid>
+      <ion-row class="ion-justify-content-center">
+        <ion-input [class.input-error]="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)" [class.input-success]="loginForm.get('email')?.valid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)" class="ion-margin-bottom input-login input-base" label="Email" labelPlacement="floating" fill="outline" placeholder="Ingrese su correo electronico" formControlName="email"></ion-input>
+        <div class="ion-margin-bottom">
+          <ng-container *ngFor="let validation of validation_messages.email">
+            <div *ngIf="(loginForm.get('email')?.hasError(validation.type) && loginForm.get('email')?.dirty)" style="color: rgb(255, 0, 0);">{{ validation.message }}</div>
+          </ng-container>
+        </div>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-input [class.input-error]="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)" [class.input-success]="loginForm.get('password')?.valid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)" class="ion-margin-bottom input-login input-base" type="password" label="Contraseña" labelPlacement="floating" fill="outline" placeholder="Ingrese su contraseña" formControlName="password"></ion-input>
+        <div class="ion-margin-bottom">
+          <ng-container *ngFor="let validation of validation_messages.password">
+            <div *ngIf="(loginForm.get('password')?.hasError(validation.type) && loginForm.get('password')?.dirty)" style="color: rgb(255, 0, 0);">{{ validation.message }}</div>
+          </ng-container>
+        </div>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-button shape="round" color="success" type="submit" [disabled]="!loginForm.valid">
+          Ingresar
+        </ion-button>
+      </ion-row>
+      <ion-row class="ion-justify-content-center">
+        <ion-button shape="round" color="warning" (click)="verRegister()">
+          Ir al Registro
+        </ion-button>
+      </ion-row>
+    </ion-grid>
+  </form>
+  {{ error_message }}
+</ion-content>

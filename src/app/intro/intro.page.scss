@@ -1,0 +1,13 @@
+.swiper-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.swiper-content img {
+  max-width: 90%;
+  max-height: 90vh;
+  object-fit: contain;
+}

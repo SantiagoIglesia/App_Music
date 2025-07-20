@@ -1,2 +1,10 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+:root{
+  --tema-claro: rgb(255, 255, 255);
+  --letras-tema-claro: black;
+  --borde-tema-claro: 2px solid black;
+  --tema-oscuro: rgb(0, 0, 0);
+  --letras-tema-oscuro: white;
+  --borde-tema-oscuro: 2px solid white;
+}

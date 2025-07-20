@@ -1,0 +1,19 @@
+<ion-split-pane contentId="main-content">
+  <ion-menu contentId="main-content">
+    <ion-header>
+      <ion-toolbar>
+        <ion-menu-toggle slot="start">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-menu-toggle>
+        <ion-title>Menu</ion-title>
+        <ion-icon name="log-out-outline" slot="end" (click)="logOut()"></ion-icon>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list>
+        <ion-item>Opcion 1</ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+</ion-split-pane>

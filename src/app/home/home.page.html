@@ -1,20 +1,74 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>
-      Blank
+      App Music
     </ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<ion-content *ngIf="datos_cargados" [style.--background]="tema_actual" [style.--color]="letra_tema_actual">
+  <swiper-container pagination="true" loop="true" slides-per-view="1" [style.background-color]="tema_actual" [style.color]="letra_tema_actual">
+    <swiper-slide *ngFor="let genre of genres" [style.background-color]="tema_actual" [style.color]="letra_tema_actual">
+      <div class="slide-content">
+        <h2>{{ genre.title }}</h2>
+        <img [src]="genre.image" [alt]="genre.title">
+        <p>{{ genre.description }}</p>
+      </div>
+      <div>
+        <ion-card class="ion-card-content" [style.background]="tema_actual" [style.border]="borde_tema_actual">
+          <ion-card-header>
+            <ion-card-title [style.color]="letra_tema_actual">{{ genre.title }}</ion-card-title>
+            <ion-card-subtitle [style.color]="letra_tema_actual">{{ genre.description }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <img [src]="genre.image" [alt]="genre.title">
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </swiper-slide>
+  </swiper-container>
+  <div>
+    <ion-button (click)="cambiarColor()">
+      Cambiar tema
+    </ion-button>
   </div>
+  <!-- Demo de storage -->
+  <div>
+    <h3>Demo Ionic Storage</h3>
+    <div>
+      <p>Tema Actual: {{ tema_actual === tema_claro ? 'Claro' : 'Oscuro' }}</p>
+    </div>
+  </div>
+  <div>
+    <ion-button (click)="guardarColor()">
+      Cambiar Tema y Guardar
+    </ion-button>
+  </div>
+  <div>
+    <ion-button (click)="verIntro()">
+      Ir al Intro
+    </ion-button>
+  </div>
+  <div>
+    <h2>Pagina Anterior: {{ pagAnt }}</h2>
+  </div>
+  <div>
+    <p class="ion-text-center">Texto Centrado</p>
+    <p class="ion-text-left">Texto a la Izquierda</p>
+    <p class="ion-text-right">Texto a la Derecha</p>
+  </div>
+  <swiper-container>
+    <swiper-slide *ngFor="let album of albums" pagination="true" loop="true" slides-per-view="3">
+      <div class="slide-content">
+        <img [src]="album.image" [alt]="album.name">
+        <h4>{{ album.name }}</h4>
+      </div>
+    </swiper-slide>
+  </swiper-container>
+</ion-content>
+<ion-content *ngIf="!datos_cargados">
+  <ion-spinner name="crescent"></ion-spinner>
 </ion-content>
