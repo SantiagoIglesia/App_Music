@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, NavController } from '@ionic/angular';
+import { IonicModule, NavController, ModalController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { StorageService } from '../services/storage.service';
-import { Router } from '@angular/router';
 import { MusicService } from '../services/music.service';
+import { SongsModalPage } from '../songs-modal/songs-modal.page';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-home',
@@ -16,198 +17,286 @@ import { MusicService } from '../services/music.service';
 
 export class HomePage implements OnInit {
 
-  //Definimos variables de temas
-  tema_claro = 'var(--tema-claro)';
-  tema_oscuro = 'var(--tema-oscuro)';
-  tema_actual = this.tema_claro;
+  lightTheme = 'var(--tema-claro)';
+  darkTheme = 'var(--tema-oscuro)';
+  currentTheme = this.lightTheme;
+  oppositeTheme = this.darkTheme;
 
-  //Definimos variables de letras
-  letra_tema_claro = 'var(--letras-tema-claro)';
-  letra_tema_oscuro = 'var(--letras-tema-oscuro)';
-  letra_tema_actual = this.letra_tema_claro;
+  lightLetter = 'var(--letras-tema-claro)';
+  darkLetter = 'var(--letras-tema-oscuro)';
+  currentLetter = this.lightLetter;
+  oppositeLetter = this.darkTheme;
 
-  //Definimos variables de bordes
-  borde_tema_claro = 'var(--borde-tema-claro)';
-  borde_tema_oscuro = 'var(--borde-tema-oscuro)';
-  borde_tema_actual = this.borde_tema_claro;
-
-  //Definimos la pag. actual
-  pagAct = 'Home'
-  pagAnt = ''
-
-  tema = ''
-  letra = ''
-  borde = ''
-
-  datos_cargados = false;
+  lightBorder = 'var(--borde-tema-claro)';
+  darkBorder = 'var(--borde-tema-oscuro)';
+  currentBorder = this.lightBorder;
+  oppositeBorder = this.darkTheme;
   
-  //Definimos el array de los generos a mostrar en el swiper
-  genres = [
-    {
-      title: "Rap",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcReTyVFrLgFSVfYMtWKxaaT1EVjxIH1pdDKmg&s",
-      description: "Lorem ipsum dolor sit amet consectetur adipiscing elit volutpat potenti pellentesque scelerisque praesent convallis, phasellus facilisi feugiat nullam pulvinar ligula gravida dignissim diam porta mollis lectus. Nullam vulputate malesuada convallis netus platea iaculis nisl aliquam, leo tristique vitae euismod egestas proin conubia eros maecenas, porta integer sociis felis a penatibus laoreet. Nunc nisi lacus in lectus semper parturient dis libero, hac velit ornare suscipit vivamus at est ligula, eget per curae laoreet massa posuere enim."
-    },
-    {
-      title: "EDM",
-      image: "https://cdn-images.dzcdn.net/images/cover/b9814933faca489edd40f5303550d29e/500x500.jpg",
-      description: "Lorem ipsum dolor sit amet consectetur adipiscing elit volutpat potenti pellentesque scelerisque praesent convallis, phasellus facilisi feugiat nullam pulvinar ligula gravida dignissim diam porta mollis lectus. Nullam vulputate malesuada convallis netus platea iaculis nisl aliquam, leo tristique vitae euismod egestas proin conubia eros maecenas, porta integer sociis felis a penatibus laoreet. Nunc nisi lacus in lectus semper parturient dis libero, hac velit ornare suscipit vivamus at est ligula, eget per curae laoreet massa posuere enim."
-    },
-    {
-      title: "Reggaeton",
-      image: "https://cdn-images.dzcdn.net/images/cover/d39c2560f43519d574029357478c98a5/0x1900-000000-80-0-0.jpg",
-      description: "Lorem ipsum dolor sit amet consectetur adipiscing elit volutpat potenti pellentesque scelerisque praesent convallis, phasellus facilisi feugiat nullam pulvinar ligula gravida dignissim diam porta mollis lectus. Nullam vulputate malesuada convallis netus platea iaculis nisl aliquam, leo tristique vitae euismod egestas proin conubia eros maecenas, porta integer sociis felis a penatibus laoreet. Nunc nisi lacus in lectus semper parturient dis libero, hac velit ornare suscipit vivamus at est ligula, eget per curae laoreet massa posuere enim."
-    }
-  ]
+  tracks: any;
+  albums: any;
+  localArtists: any;
+  artists: any;
 
-  tracks: any
-  albums: any
+  song: any = {
+
+    id: '',
+    name: '',
+    preview_url: '',
+    playing: false
+  };
+
+  currentSong: any = {};
+
+  newTime: any;
+
+  favouriteTracks: any = [];
+
+  favourite = false;
+
+  iconFavourite = 'heart';
+
+  userLogged: any;
+
+  favourites: any = [];
+
+  idFavourite: any;
   
-  //Instanciamos el constructor
-  constructor(private storageService: StorageService, private router: Router, private navCtrl: NavController, private musicService: MusicService) {}
+  constructor(private storageService: StorageService, private navController: NavController, private musicService: MusicService, private modalController: ModalController, private userService: UserService) {}
 
-  //Inicializamos la vista
   async ngOnInit() {
 
-    await this.loadStorageData()
+    const savedTheme = await this.storageService.get('theme');
 
-    this.simularCargaDatos()
+    if(savedTheme === 'Light') {
 
-    await this.storageService.set('visitoIntro', false)
+      this.currentTheme = this.lightTheme;
+      this.currentLetter = this.lightLetter;
+      this.currentBorder = this.lightBorder;
 
-    this.datos_cargados = true;
+      this.oppositeTheme = this.darkTheme;
+      this.oppositeLetter = this.darkLetter;
+      this.oppositeBorder = this.darkBorder;
 
-    this.loadTracks()
+    } else {
 
-    this.loadAlbums()
+      this.currentTheme = this.darkTheme;
+      this.currentLetter = this.darkLetter;
+      this.currentBorder = this.darkBorder;
+
+      this.oppositeTheme = this.lightTheme;
+      this.oppositeLetter = this.lightLetter;
+      this.oppositeBorder = this.lightBorder;
+    }
+
+    await this.storageService.set('visitedIntro', false);
+
+    this.loadTracks();
+
+    this.loadAlbums();
+
+    this.loadLocalArtists();
+
+    this.loadArtists();
+
+    const userId = await this.storageService.get('userId');
+
+    this.favouriteTracks = await this.userService.getUserFavouriteTracks(userId);
+
+    if(userId) {
+
+      this.userLogged = userId;
+    }
+
+    const favourites = await this.userService.getFavourites();
+
+    if(favourites) {
+
+      this.favourites = favourites;
+    }
   }
 
   loadTracks() {
+
     this.musicService.getTracks().then(tracks => {
       this.tracks = tracks
-      console.log(this.tracks, " las canciones")
     })
   }
 
   loadAlbums() {
+
     this.musicService.getAlbums().then(albums => {
       this.albums = albums
-      console.log(this.albums, " los albumes")
     })
   }
 
-  async cambiarColor(){
+  loadLocalArtists() {
 
-    this.tema_actual = this.tema_actual === this.tema_claro ? this.tema_oscuro : this.tema_claro
-    this.letra_tema_actual = this.letra_tema_actual === this.letra_tema_claro ? this.letra_tema_oscuro : this.letra_tema_claro
-    this.borde_tema_actual = this.borde_tema_actual === this.borde_tema_claro ? this.borde_tema_oscuro : this.borde_tema_claro
+    this.localArtists = this.musicService.getLocalArtists();
   }
 
-  async guardarColor(){
+  async loadSongsAlbum(albumId: string) {
 
-    this.cambiarColor();
+    const songs = await this.musicService.gestSongsByAlbum(albumId);
 
-    if(this.tema_actual === this.tema_claro){
+    const modal = await this.modalController.create ({
 
-      this.tema = 'Claro'
+      component: SongsModalPage,
+      componentProps: {
+        songs: songs,
+        title: 'Album'
+      }
+    });
 
-    } else {
+    modal.onDidDismiss().then((result) => {
 
-      this.tema = 'Oscuro'
-    }
+      if(result.data) {
 
-    if(this.letra_tema_actual === this.letra_tema_claro){
+        this.song = result.data;
 
-      this.letra = 'Clara'
+        this.isFavourite(this.song.id);
+      }
+    });
 
-    } else {
-
-      this.letra = 'Oscura'
-    }
-
-    if(this.borde_tema_actual === this.borde_tema_claro){
-
-      this.borde = 'Claro'
-
-    } else {
-
-      this.borde = 'Oscuro'
-    }
-
-    await this.storageService.set('theme', this.tema)
-    await this.storageService.set('letter', this.letra)
-    await this.storageService.set('border', this.borde)
-
-    console.log('Tema Guardado: ', this.tema)
-    console.log('Letra Guardada: ', this.letra)
-    console.log('Borde Guardado: ', this.borde)
+    modal.present();
   }
 
-  async loadStorageData() {
+  loadArtists() {
 
-    const savedTheme = await this.storageService.get('theme')
-    const savedLetter = await this.storageService.get('letter')
-    const savedBorder = await this.storageService.get('border')
-    const savedPage = await this.storageService.get('navigation')
+    this.musicService.getArtists().then(artists => {
+
+      this.artists = artists
+    })
+  }
+  
+  async loadSongsArtist(artistId: string) {
+
+    const songs = await this.musicService.gestSongsByArtists(artistId);
+
+    const modal = await this.modalController.create ({
+
+      component: SongsModalPage,
+      componentProps: {
+        songs: songs,
+        title: 'Artista'
+      }
+    });
+
+    modal.onDidDismiss().then((result) => {
+
+      if(result.data) {
+
+        this.song = result.data;
+
+        this.isFavourite(this.song.id);
+      }
+    });
+
+    modal.present();
+  }
+
+  playSong() {
+
+    this.currentSong = new Audio(this.song.preview_url);
+
+    this.currentSong.play();
+
+    this.currentSong.addEventListener("timeupdate", () => {
+      
+      this.newTime = this.currentSong.currentTime / this.currentSong.duration;
+    })
+
+    this.song.playing = true;
+  }
+
+  pauseSong() {
+
+    this.currentSong.pause();
     
-    if(savedTheme === 'Claro') {
+    this.song.playing = false;
+  }
 
-      this.tema_actual = this.tema_claro;
+  formatTime(seconds: number) {
+
+    if(!seconds || isNaN(seconds)) return "0:00";
+
+    const minutes  = Math.floor(seconds / 60);
+
+    const remainingSeconds = Math.floor(seconds % 60);
+
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
+
+  getRemainingTime() {
+
+    if(!this.currentSong?.duration || !this.currentSong?.currentTime) {
+      return 0;
+    }
+
+    return this.currentSong.duration - this.currentSong.currentTime;
+  }
+
+  isFavourite(trackId: any) {
+
+    const isFav = this.favouriteTracks.some((track: any) => track.id === trackId);
+
+    if(isFav != null) {
+
+      this.favourite = isFav;
+    }
+
+    if(this.favourite === true){
+
+      this.iconFavourite = 'close';
 
     } else {
 
-      this.tema_actual = this.tema_oscuro;
+      this.iconFavourite = 'heart';
     }
 
-    if(savedLetter === 'Clara') {
+    const idFav = this.favourites.find((fav: any) => fav.user_id === this.userLogged && fav.track_id === trackId);
+    
+    if(idFav != null) {
 
-      this.letra_tema_actual = this.letra_tema_claro;
+      this.idFavourite = idFav.id;
+    }
+  }
+
+  async selectFavourite(trackId: string) {
+
+    if(this.favourite === true){
+
+      const response = await this.userService.deleteFavouriteTrack(this.idFavourite);
+
+      if (response.ok) {
+      
+        this.favourite = false;
+
+        this.iconFavourite = 'heart';
+
+      } else {
+
+        this.favourite = true;
+
+        this.iconFavourite = 'close';
+
+      }
 
     } else {
 
-      this.letra_tema_actual = this.letra_tema_oscuro;
+      const response = await this.userService.saveFavouriteTrack(this.userLogged, trackId);
+
+      if (response.ok) {
+
+        this.favourite = true;
+
+        this.iconFavourite = 'close';
+
+      } else {
+
+        this.favourite = false;
+
+        this.iconFavourite = 'heart';
+      }
     }
-
-    if(savedBorder === 'Claro') {
-
-      this.borde_tema_actual = this.borde_tema_claro;
-
-    } else {
-
-      this.borde_tema_actual = this.borde_tema_oscuro;
-    }
-
-    if(savedPage) {
-
-      this.pagAnt = savedPage;
-    }
-  }
-
-  async verIntro() {
-
-    await this.storageService.set('navigation', this.pagAct)
-    const savedPage = await this.storageService.get('navigation')
-
-    if(savedPage) {
-
-      this.pagAnt = savedPage;
-    }
-
-    console.log("Ir al Intro")
-    this.navCtrl.navigateForward('/intro')
-  }
-
-  async simularCargaDatos() {
-    const data = await this.obtenerDatosSimulados()
-    console.log('Datos SImulados: ', data)
-  }
-
-  obtenerDatosSimulados() {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve(['Rock', 'Pop', 'Jazz'])
-        //reject("Hubo error al obtener los datos")
-      }, 6000)
-    })
   }
 }

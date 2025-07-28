@@ -1,8 +1,7 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
-import { IonicModule, NavController } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { IonicModule, NavController, ToastController } from '@ionic/angular';
 import { StorageService } from '../services/storage.service';
 import { AuthService } from '../services/auth.service';
 
@@ -16,22 +15,18 @@ import { AuthService } from '../services/auth.service';
 
 export class RegisterPage implements OnInit {
 
-  //Definimos variables de letras
-  letra = 'var(--letras-tema-claro)';
+  letter = 'var(--letras-tema-claro)';
 
   registerForm: FormGroup;
 
-  avatar = '/assets/images/avatar-negro.jpg'
+  avatar = '/assets/images/dark-avatar.png';
 
-  background = '/assets/images/background-register.jpg'
+  background = '/assets/images/background-register.jpg';
 
-  error_message = ''
-
-  logged = false
-
-  validation_messages = {
+  validationMessages = {
 
     name: [
+
       {
         type: "required", message: 'El nombre es obligatorio.'
       },
@@ -40,9 +35,10 @@ export class RegisterPage implements OnInit {
       }
     ],
 
-    last_name: [
+    userName: [
+
       {
-        type: "required", message: 'El apellido es obligatorio.'
+        type: "required", message: 'El usuario es obligatorio.'
       },
       {
         type: "pattern", message: "Caracteres invalidos."
@@ -50,6 +46,7 @@ export class RegisterPage implements OnInit {
     ],
     
     email: [
+
       {
         type: "required", message: 'El correo electronico es obligatorio.'
       },
@@ -59,6 +56,7 @@ export class RegisterPage implements OnInit {
     ],
 
     password: [
+
       {
         type: "required", message: 'La contraseña es obligatoria.'
       },
@@ -67,79 +65,83 @@ export class RegisterPage implements OnInit {
       }
     ],
 
-    confirm_password: [
+    confirmPassword: [
+
       {
         type: "required", message: 'Debe confirmar su contraseña.'
       }
     ]
   }
 
-  password = ''
-  confirm_pass = ''
-
-  constructor(private router: Router, private storageService: StorageService, private formBuilder: FormBuilder, private authService: AuthService, private navCtrl: NavController) {
+  constructor(private storageService: StorageService, private formBuilder: FormBuilder, private authService: AuthService, private navController: NavController, private toastController: ToastController) {
 
     this.registerForm = this.formBuilder.group({
 
       name: new FormControl(
+
         '',
         Validators.compose([
-          Validators.required, //Campo obligatorio
-          Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/) //Valida que sea solo letras
+          Validators.required,
+          Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/)
         ])
       ),
 
-      last_name: new FormControl(
+      userName: new FormControl(
+
         '',
         Validators.compose([
-          Validators.required, //Campo obligatorio
-          Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$/) //Valida que sea solo letras
+          Validators.required,
+          Validators.pattern(/^[a-zA-Z0-9]*$/)
         ])
       ),
 
       email: new FormControl(
+
         '',
         Validators.compose([
-          Validators.required, //Campo obligatorio
-          Validators.email //Valida el correo electronico
+          Validators.required,
+          Validators.email
         ])
       ),
 
       password: new FormControl(
+
         '',
         Validators.compose([
-          Validators.required, //Campo obligatorio
+          Validators.required,
           Validators.minLength(6)
         ])
       ),
 
-      confirm_password: new FormControl(
-        '', Validators.required //Campo obligatorio
+      confirmPassword: new FormControl(
+
+        '',
+        Validators.required
       )
     },
     {
-      validators: passwordsIguales('password', 'confirm_password')
+      validators: samePasswords('password', 'confirmPassword')
     })
 
-    function passwordsIguales(passwordKey: string, confirmKey: string) {
+    function samePasswords(password: string, confirm: string) {
 
       return (formGroup: FormGroup) => {
 
-        const password = formGroup.controls[passwordKey];
-        const confirmPassword = formGroup.controls[confirmKey];
+        const passwordInput = formGroup.controls[password];
+        const confirmInput = formGroup.controls[confirm];
     
-        if (password.value !== confirmPassword.value) {
+        if (passwordInput.value !== confirmInput.value) {
 
-          confirmPassword.setErrors({ notEqual: true });
+          confirmInput.setErrors({ notEqual: true });
 
         } else {
           
-          if (confirmPassword.errors && !confirmPassword.errors['notEqual']) {
+          if (confirmInput.errors && !confirmInput.errors['notEqual']) {
 
             return;
           }
 
-          confirmPassword.setErrors(null);
+          confirmInput.setErrors(null);
         }
       }
     }
@@ -147,37 +149,88 @@ export class RegisterPage implements OnInit {
 
   async ngOnInit() {
     
-    await this.storageService.set('avatar', this.avatar)
-    await this.storageService.set('logged', this.logged)
+    await this.storageService.get('registered');
   }
 
-  registerUser(credentials: any) {
+  async registerUser(credentials: any) {
 
-    console.log(credentials)
+    const response = await this.authService.registerUser(credentials);
 
-    this.authService.registerUser(credentials).then(res => {
+    console.log(response)
+    
+    if (response.ok) {
 
-      this.error_message = ''
+      this.storageService.set('registered', true);
 
-      this.storageService.set('name', credentials.name)
-      this.storageService.set('last_name', credentials.last_name)
-      this.storageService.set('email', credentials.email)
-      this.storageService.set('password', credentials.password)
+      const toast = await this.toastController.create({
 
-      this.navCtrl.navigateForward('/login')
+        message: 'Usuario creado correctamente. Redireccionando al Login.',
+        duration: 3000,
+        color: 'success',
+        position: 'bottom',
+        cssClass: "toast-content",
+        buttons: [
+          {
+            text: 'Continuar',
+            role: 'cancel'
+          }
+        ]
+      });
+    
+      await toast.present();
+      await toast.onDidDismiss();
 
-      this.storageService.set('registered', true)
+      this.navController.navigateForward('/login');
 
-    }).catch(error => {
+    } else {
 
-      this.error_message = error
+      this.storageService.set('registered', false);
+        
+      const toast = await this.toastController.create({
 
-      this.storageService.set('registered', false)
-    })
+        message: 'El usuario ya se encuentra registrado. Vuelva a intentarlo.',
+        duration: 3000,
+        color: 'danger',
+        position: 'bottom',
+        cssClass: "toast-content",
+        buttons: [
+          {
+            text: 'Cerrar',
+            role: 'cancel'
+          }
+        ]
+      });
+      
+      await toast.present();
+      await toast.onDidDismiss();
+    }
   }
 
-  verLogin() {
+  goLogin() {
 
-    this.navCtrl.navigateForward('/login')
+    this.navController.navigateForward('/login')
+  }
+
+  getBorderColor(field: any) {
+
+    const validatedField = this.registerForm.get(field);
+
+    if (!validatedField) {
+
+      return 'var(--ion-color-dark)';
+    }
+  
+    if ((validatedField.invalid && (validatedField.dirty || validatedField.touched))) {
+
+      return 'var(--ion-color-danger)';
+
+    } else if ((validatedField.valid && (validatedField.dirty || validatedField.touched))) {
+
+      return 'var(--ion-color-success)';
+
+    } else {
+      
+      return 'var(--ion-color-dark)';
+    }
   }
 }

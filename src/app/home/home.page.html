@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar [style.--background]="oppositeTheme" [style.--color]="oppositeLetter">
     <ion-title>
       App Music
     </ion-title>
@@ -9,66 +9,53 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content *ngIf="datos_cargados" [style.--background]="tema_actual" [style.--color]="letra_tema_actual">
-  <swiper-container pagination="true" loop="true" slides-per-view="1" [style.background-color]="tema_actual" [style.color]="letra_tema_actual">
-    <swiper-slide *ngFor="let genre of genres" [style.background-color]="tema_actual" [style.color]="letra_tema_actual">
-      <div class="slide-content">
-        <h2>{{ genre.title }}</h2>
-        <img [src]="genre.image" [alt]="genre.title">
-        <p>{{ genre.description }}</p>
-      </div>
-      <div>
-        <ion-card class="ion-card-content" [style.background]="tema_actual" [style.border]="borde_tema_actual">
-          <ion-card-header>
-            <ion-card-title [style.color]="letra_tema_actual">{{ genre.title }}</ion-card-title>
-            <ion-card-subtitle [style.color]="letra_tema_actual">{{ genre.description }}</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <img [src]="genre.image" [alt]="genre.title">
-          </ion-card-content>
-        </ion-card>
-      </div>
-    </swiper-slide>
-  </swiper-container>
-  <div>
-    <ion-button (click)="cambiarColor()">
-      Cambiar tema
-    </ion-button>
+<ion-content [style.--background]="currentTheme" [style.--color]="currentLetter">
+  <div class="ion-text-center">
+    <ion-text>
+      <h1>Albumes</h1>
+    </ion-text>
   </div>
-  <!-- Demo de storage -->
-  <div>
-    <h3>Demo Ionic Storage</h3>
-    <div>
-      <p>Tema Actual: {{ tema_actual === tema_claro ? 'Claro' : 'Oscuro' }}</p>
-    </div>
-  </div>
-  <div>
-    <ion-button (click)="guardarColor()">
-      Cambiar Tema y Guardar
-    </ion-button>
-  </div>
-  <div>
-    <ion-button (click)="verIntro()">
-      Ir al Intro
-    </ion-button>
-  </div>
-  <div>
-    <h2>Pagina Anterior: {{ pagAnt }}</h2>
-  </div>
-  <div>
-    <p class="ion-text-center">Texto Centrado</p>
-    <p class="ion-text-left">Texto a la Izquierda</p>
-    <p class="ion-text-right">Texto a la Derecha</p>
-  </div>
-  <swiper-container>
-    <swiper-slide *ngFor="let album of albums" pagination="true" loop="true" slides-per-view="3">
+  <swiper-container [style.--background]="currentTheme" [style.--color]="currentLetter">
+    <swiper-slide *ngFor="let album of albums" pagination="true" loop="true" slides-per-view="1" (click)="loadSongsAlbum(album.id)">
       <div class="slide-content">
         <img [src]="album.image" [alt]="album.name">
         <h4>{{ album.name }}</h4>
       </div>
     </swiper-slide>
   </swiper-container>
+  <div class="ion-text-center">
+    <ion-text>
+      <h1>Artistas</h1>
+    </ion-text>
+  </div>
+  <swiper-container [style.--background]="currentTheme" [style.--color]="currentLetter">
+    <swiper-slide *ngFor="let artist of artists" pagination="true" loop="true" slides-per-view="1" (click)="loadSongsArtist(artist.id)">
+      <div class="slide-content">
+        <img [src]="artist.image" [alt]="artist.name">
+        <h4>{{ artist.name }}</h4>
+      </div>
+    </swiper-slide>
+  </swiper-container>
 </ion-content>
-<ion-content *ngIf="!datos_cargados">
-  <ion-spinner name="crescent"></ion-spinner>
-</ion-content>
+
+<ion-footer>
+  <ion-grid>
+    <ion-row>
+      <ion-progress-bar [value]="newTime || 0"></ion-progress-bar>
+      <ion-col class="ion-text-start">{{ formatTime(currentSong?.currentTime) || "0:00" }}</ion-col>
+      <ion-col class="ion-text-end">{{ formatTime(getRemainingTime()) || "0:00" }}</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="1">
+        <ion-icon [name]="iconFavourite" (click)="selectFavourite(song.id)"></ion-icon>
+      </ion-col>
+      <ion-col size="10" class="ion-text-center">
+        {{ song.name || "----"}}
+      </ion-col>
+      <ion-col size="1">
+        <ion-icon name="play" *ngIf="!song.playing" (click)="playSong()"></ion-icon>
+        <ion-icon name="pause" *ngIf="song.playing" (click)="pauseSong()"></ion-icon>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>

@@ -1,18 +1,17 @@
 <ion-split-pane contentId="main-content">
   <ion-menu contentId="main-content">
     <ion-header>
-      <ion-toolbar>
+      <ion-toolbar [style.--background]="oppositeTheme" [style.--color]="oppositeLetter">
         <ion-menu-toggle slot="start">
           <ion-icon name="close-outline"></ion-icon>
         </ion-menu-toggle>
-        <ion-title>Menu</ion-title>
-        <ion-icon name="log-out-outline" slot="end" (click)="logOut()"></ion-icon>
+        <ion-title>{{ user.name }}</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content>
-      <ion-list>
-        <ion-item>Opcion 1</ion-item>
-      </ion-list>
+    <ion-content [style.--background]="currentTheme" [style.--color]="currentLetter">
+      <form [formGroup]="changeTheme">
+        <ion-toggle formControlName="theme" helperText="Oscuro" errorText="Claro" (ionChange)="onChange()" justify="space-between">Tema</ion-toggle>
+      </form>
     </ion-content>
   </ion-menu>
   <ion-router-outlet id="main-content"></ion-router-outlet>

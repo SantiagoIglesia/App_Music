@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule, NavController } from '@ionic/angular';
-import { Router } from '@angular/router';
 import { StorageService } from '../services/storage.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
@@ -17,25 +16,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 export class IntroPage implements OnInit {
 
-  //Definimos variables de temas
-  tema_claro = 'var(--tema-claro)';
-  tema_oscuro = 'var(--tema-oscuro)';
-  tema_actual = this.tema_claro;
-
-  //Definimos variables de letras
-  letra_tema_claro = 'var(--letras-tema-claro)';
-  letra_tema_oscuro = 'var(--letras-tema-oscuro)';
-  letra_tema_actual = this.letra_tema_claro;
-
-  //Definimos variables de bordes
-  borde_tema_claro = 'var(--borde-tema-claro)';
-  borde_tema_oscuro = 'var(--borde-tema-oscuro)';
-  borde_tema_actual = this.borde_tema_claro;
-  
-  pagAct = 'Intro'
-  pagAnt = ''
-
-  datos_cargados = false;
+  lightTheme = 'var(--tema-claro)';
+  darkTheme = 'var(--tema-oscuro)';
+  currentTheme = this.lightTheme;
 
   intros = [
     {
@@ -49,52 +32,27 @@ export class IntroPage implements OnInit {
     }
   ]
 
-  constructor(private router: Router, private storageService: StorageService, private navCtrl: NavController) { }
+  constructor(private storageService: StorageService, private navController: NavController) { }
 
   async ngOnInit() {
 
-    await this.loadStorageData()
+    const savedTheme = await this.storageService.get('theme');
 
-    this.datos_cargados = true;
-  }
+    if(savedTheme === 'Light') {
 
-  async loadStorageData() {
-
-    const savedTheme = await this.storageService.get('theme')
-    const savedLetter = await this.storageService.get('letter')
-    const savedPage = await this.storageService.get('navigation')
-
-    if(savedTheme === 'Claro') {
-
-      this.tema_actual = this.tema_claro;
+      this.currentTheme = this.lightTheme;
 
     } else {
 
-      this.tema_actual = this.tema_oscuro;
-    }
-
-    if(savedLetter === 'Clara') {
-
-      this.letra_tema_actual = this.letra_tema_claro;
-
-    } else {
-
-      this.letra_tema_actual = this.letra_tema_oscuro;
-    }
-    
-    if(savedPage) {
-
-      this.pagAnt = savedPage;
+      this.currentTheme = this.darkTheme;
     }
   }
 
-  async verHome() {
+  goHome() {
+
+    this.storageService.set('visitedIntro', true)
     
-    await this.storageService.set('navigation', this.pagAct)
-    await this.storageService.set('visitoIntro', true)
-    
-    console.log("Ir al Home")
-    this.navCtrl.navigateForward('/menu/home')
+    this.navController.navigateForward('/menu/home')
   }
 
 }

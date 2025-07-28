@@ -1,0 +1,82 @@
+{"artists": [
+  {
+    "nombre": "Coldplay",
+    "genero": "Rock alternativo",
+    "pais": "Reino Unido",
+    "anios_activo": "1996 - presente",
+    "albumes": [
+      {
+        "titulo": "Parachutes",
+        "anio": 2000
+      },
+      {
+        "titulo": "A Rush of Blood to the Head",
+        "anio": 2002
+      }
+    ]
+  },
+  {
+    "nombre": "Shakira",
+    "genero": "Pop latino",
+    "pais": "Colombia",
+    "anios_activo": "1990 - presente",
+    "albumes": [
+      {
+        "titulo": "Pies Descalzos",
+        "anio": 1995
+      },
+      {
+        "titulo": "¿Dónde Están los Ladrones?",
+        "anio": 1998
+      }
+    ]
+  },
+  {
+    "nombre": "Daft Punk",
+    "genero": "Electrónica",
+    "pais": "Francia",
+    "anios_activo": "1993 - 2021",
+    "albumes": [
+      {
+        "titulo": "Discovery",
+        "anio": 2001
+      },
+      {
+        "titulo": "Random Access Memories",
+        "anio": 2013
+      }
+    ]
+  },
+  {
+    "nombre": "Adele",
+    "genero": "Soul / Pop",
+    "pais": "Reino Unido",
+    "anios_activo": "2006 - presente",
+    "albumes": [
+      {
+        "titulo": "21",
+        "anio": 2011
+      },
+      {
+        "titulo": "30",
+        "anio": 2021
+      }
+    ]
+  },
+  {
+    "nombre": "Juanes",
+    "genero": "Pop rock latino",
+    "pais": "Colombia",
+    "anios_activo": "2000 - presente",
+    "albumes": [
+      {
+        "titulo": "Un Día Normal",
+        "anio": 2002
+      },
+      {
+        "titulo": "La Vida... Es un Ratico",
+        "anio": 2007
+      }
+    ]
+  }
+]}

@@ -2,27 +2,6 @@
   max-width: 100px;
 }
 
-.input-base {
-  --border-color: black;
-  --highlight-color-focused: black;
-  border: 1px solid black;
-  border-radius: 8px;
-}
-
-.input-error {
-  --border-color: red;
-  --highlight-color-focused: red;
-  border: 1px solid red;
-  border-radius: 8px;
-}
-
-.input-success {
-  --border-color: green;
-  --highlight-color-focused: green;
-  border: 1px solid green;
-  border-radius: 8px;
-}
-
 .input-register{
   width: 70%;
 }

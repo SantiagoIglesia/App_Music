@@ -5,22 +5,35 @@ import { firstValueFrom } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-
-export class AuthService {
+export class UserService {
 
   urlServer = "https://music.fly.dev"
 
   constructor(private http: HttpClient) { }
 
-  async loginUser(credentials: any): Promise<any> {
+  async getUser(userId: string) {
 
-    const url = `${this.urlServer}/login`;
+    return fetch(`${this.urlServer}/current_user/${userId}`).then(
+      response => response.json()
+    );
+  }
+
+  async getUserFavouriteTracks(userId: string) {
+
+    return fetch(`${this.urlServer}/user_favorites/${userId}`).then(
+      response => response.json()
+    );
+  }
+
+  async saveFavouriteTrack(userId: string, trackId: string): Promise<any> {
+
+    const url = `${this.urlServer}/favorite_tracks`;
     
     const body = {
 
-      "user": {
-        "email": credentials.email,
-        "password": credentials.password
+      "favorite_track": {
+        "user_id": userId,
+        "track_id": trackId
       }
     };
 
@@ -51,23 +64,19 @@ export class AuthService {
         status: error.status,
         message: error?.error?.message || 'Error en la solicitud'
       }
-
     }
   }
 
-  async registerUser(credentials: any): Promise<any> {
+  async getFavourites() {
 
-    const url = `${this.urlServer}/signup`;
-    
-    const body = {
+    return fetch(`${this.urlServer}/favorite_tracks`).then(
+      response => response.json()
+    );
+  }
 
-      "user": {
-        "email": credentials.email,
-        "password": credentials.password,
-        "name": credentials.name,
-        "username": credentials.userName
-      }
-    };
+  async deleteFavouriteTrack(favouriteId: string): Promise<any> {
+
+    const url = `${this.urlServer}/favorite_tracks/${favouriteId}`;
 
     const headers = new HttpHeaders({
 
@@ -76,7 +85,7 @@ export class AuthService {
 
     try {
 
-      const response = await firstValueFrom(this.http.post(url, body, {
+      const response = await firstValueFrom(this.http.delete(url, {
         headers,
         observe: 'response'
       }));
@@ -96,7 +105,6 @@ export class AuthService {
         status: error.status,
         message: error?.error?.message || 'Error en la solicitud'
       }
-
     }
   }
 }

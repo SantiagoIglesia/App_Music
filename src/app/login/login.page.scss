@@ -1,28 +1,7 @@
-.profile-default img{
+.profile-default img {
   max-width: 100px;
 }
 
-.input-base {
-  --border-color: white;
-  --highlight-color-focused: white;
-  border: 1px solid white;
-  border-radius: 8px;
-}
-
-.input-error {
-  --border-color: red;
-  --highlight-color-focused: red;
-  border: 1px solid red;
-  border-radius: 8px;
-}
-
-.input-success {
-  --border-color: green;
-  --highlight-color-focused: green;
-  border: 1px solid green;
-  border-radius: 8px;
-}
-
-.input-login{
+.input-login {
   width: 70%;
 }
